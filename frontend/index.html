@@ -1,1 +1,57 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TradeLang AI Engine — Demo</title>
+  <link rel="stylesheet" href="/style.css">
+  <script defer src="/script.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <h1>TradeLang AI Engine</h1>
+      <p class="subtitle">Type natural-language trading rules — convert to DSL, AST, Python and run a demo backtest.</p>
+    </header>
+
+    <main class="container">
+      <section class="panel input-panel">
+        <label for="nl">Natural language rule</label>
+        <textarea id="nl" placeholder='e.g. "Buy when close is above the 20-day moving average and volume is above 1M. Exit when RSI(14) < 30."' rows="4"></textarea>
+        <div class="controls">
+          <button id="runBtn" class="btn primary">Run</button>
+          <span id="status" class="status">Ready</span>
+        </div>
+      </section>
+
+      <section class="panel outputs">
+        <div class="output-card">
+          <h3>Generated DSL</h3>
+          <pre id="dsl" class="code"></pre>
+        </div>
+
+        <div class="output-card">
+          <h3>AST (JSON)</h3>
+          <pre id="ast" class="code"></pre>
+        </div>
+
+        <div class="output-card">
+          <h3>Generated Python</h3>
+          <pre id="py" class="code"></pre>
+        </div>
+
+        <div class="output-card">
+          <h3>Backtest Report</h3>
+          <pre id="report" class="code"></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <small>© TradeLang AI Engine — Demo. Backend expects environment variable <code>GROQ_API_KEY</code> for optional model use.</small>
+    </footer>
+  </div>
+</body>
+</html>
+
