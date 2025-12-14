@@ -1,4 +1,4 @@
-# backend/api/groq.py
+# api/groq.py
 # Vercel Python Serverless Function
 # Endpoint: POST /api/groq
 
@@ -6,15 +6,15 @@ import os
 import json
 import traceback
 
-from nl_to_json import nl_to_structured
-from dsl_printer import structured_to_dsl
-from dsl_parser import parse_dsl
-from ast_to_python import generate_python_code
-from backtester import run_backtest_with_code
+# ✅ FIXED: RELATIVE IMPORTS
+from .nl_to_json import nl_to_structured
+from .dsl_printer import structured_to_dsl
+from .dsl_parser import parse_dsl
+from .ast_to_python import generate_python_code
+from .backtester import run_backtest_with_code
 
 
 def handler(request):
-    # ✅ REQUIRED DEBUG LOGGING
     print("HANDLER HIT")
     print("ENV KEY PRESENT:", bool(os.getenv("GROQ_API_KEY")))
 
