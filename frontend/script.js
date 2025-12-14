@@ -1,27 +1,21 @@
-// frontend/script.js
-// Connects UI to backend endpoint /api/groq
-
 document.addEventListener("DOMContentLoaded", () => {
   const runBtn = document.getElementById("runBtn");
   const nlEl = document.getElementById("nl");
-  const status = document.getElementById("status");
+  const statusEl = document.getElementById("status");
+
   const dslEl = document.getElementById("dsl");
   const astEl = document.getElementById("ast");
   const pyEl = document.getElementById("py");
   const reportEl = document.getElementById("report");
 
-  function setStatus(s, busy=false){
-    status.textContent = s;
-    if(busy) status.style.opacity = "0.7"; else status.style.opacity = "1";
-  }
-
   async function run() {
     const text = nlEl.value.trim();
-    if(!text){
-      setStatus("Enter a natural-language rule.");
+    if (!text) {
+      statusEl.textContent = "Please enter a rule.";
       return;
     }
-    setStatus("Running...", true);
+
+    statusEl.textContent = "Running...";
     dslEl.textContent = "";
     astEl.textContent = "";
     pyEl.textContent = "";
@@ -30,30 +24,33 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const res = await fetch("/api/groq", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({text})
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
       });
-      if(!res.ok){
-        const txt = await res.text();
-        setStatus("Error: " + res.status);
-        reportEl.textContent = txt;
+
+      const textResp = await res.text();
+      console.log("RAW RESPONSE:", textResp);
+
+      if (!res.ok) {
+        reportEl.textContent = "API Error:\n" + textResp;
+        statusEl.textContent = "Error";
         return;
       }
-      const data = await res.json();
+
+      const data = JSON.parse(textResp);
+
       dslEl.textContent = data.dsl || "";
       astEl.textContent = JSON.stringify(data.ast, null, 2);
       pyEl.textContent = data.python || "";
       reportEl.textContent = JSON.stringify(data.backtest, null, 2);
-      setStatus("Done");
+
+      statusEl.textContent = "Done";
     } catch (err) {
-      setStatus("Network/error");
-      reportEl.textContent = String(err);
+      console.error(err);
+      reportEl.textContent = "Fetch error: " + err.message;
+      statusEl.textContent = "Error";
     }
   }
 
   runBtn.addEventListener("click", run);
-
-  // convenience: sample rule
-  nlEl.value = "Buy when close is above the 20-day moving average and volume is above 1M. Exit when RSI(14) < 30.";
 });
-
