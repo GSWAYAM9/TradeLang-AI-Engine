@@ -6,7 +6,7 @@ import os
 import json
 import traceback
 
-# ✅ FIXED: RELATIVE IMPORTS
+# ✅ RELATIVE IMPORTS (CORRECT)
 from .nl_to_json import nl_to_structured
 from .dsl_printer import structured_to_dsl
 from .dsl_parser import parse_dsl
@@ -20,14 +20,14 @@ def handler(request):
 
     try:
         # -----------------------------
-        # Parse request body
+        # Parse request body (VERCEL FIX)
         # -----------------------------
         try:
-            body = request.json()
+            body = json.loads(request.body)
         except Exception:
             return {
                 "statusCode": 400,
-                "body": json.dumps({"error": "Invalid request"})
+                "body": json.dumps({"error": "Invalid JSON body"})
             }
 
         text = body.get("text")
@@ -76,6 +76,9 @@ def handler(request):
 
         return {
             "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json"
+            },
             "body": json.dumps(response, default=str)
         }
 
@@ -84,6 +87,9 @@ def handler(request):
         print(traceback.format_exc())
         return {
             "statusCode": 500,
+            "headers": {
+                "Content-Type": "application/json"
+            },
             "body": json.dumps({
                 "error": "Internal Server Error",
                 "detail": str(e)
