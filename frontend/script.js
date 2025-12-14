@@ -10,11 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function run() {
     const text = nlEl.value.trim();
+
     if (!text) {
       statusEl.textContent = "Please enter a rule.";
       return;
     }
 
+    // Reset UI
     statusEl.textContent = "Running...";
     dslEl.textContent = "";
     astEl.textContent = "";
@@ -22,23 +24,25 @@ document.addEventListener("DOMContentLoaded", () => {
     reportEl.textContent = "";
 
     try {
+      // ✅ SAME ORIGIN CALL (Railway handles routing)
       const res = await fetch("/api/groq", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ text })
       });
 
-      const textResp = await res.text();
-      console.log("RAW RESPONSE:", textResp);
-
       if (!res.ok) {
-        reportEl.textContent = "API Error:\n" + textResp;
+        const errText = await res.text();
+        reportEl.textContent = "API Error:\n" + errText;
         statusEl.textContent = "Error";
         return;
       }
 
-      const data = JSON.parse(textResp);
+      const data = await res.json();
 
+      // Populate outputs
       dslEl.textContent = data.dsl || "";
       astEl.textContent = JSON.stringify(data.ast, null, 2);
       pyEl.textContent = data.python || "";
@@ -47,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       statusEl.textContent = "Done";
     } catch (err) {
       console.error(err);
-      reportEl.textContent = "Fetch error: " + err.message;
+      reportEl.textContent = "Request failed:\n" + err.message;
       statusEl.textContent = "Error";
     }
   }
